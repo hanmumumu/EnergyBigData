@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="upc.backend.mapper.BbMapper">
+    <resultMap id="BaseResultMap" type="upc.backend.entity.Teacher">
+        <id column="idteacher" jdbcType="INTEGER" property="idteacher" />
+        <result column="teachername" jdbcType="VARCHAR" property="teachername" />
+        <result column="locked" jdbcType="TINYINT" property="locked" />
+        <result column="deleted" jdbcType="TINYINT" property="deleted" />
+        <result column="register_time" jdbcType="TIMESTAMP" property="register_time" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        idteacher, teachername, locked, deleted, register_time
+    </sql>
+
+
+    <select id="findAllUserList" parameterType="Map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from teacher
+        <if test="start!=null and limit!=null">
+            limit #{start},#{limit}
+        </if>
+    </select>
+
+    <select id="getNumOfTotalUsers" parameterType="Map" resultType="int">
+        select count(*) from teacher
+    </select>
+
+    <update id="lockUserBatch">
+        update teacher
+        set locked=#{lockStatus} where idteacher in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+    <insert id="insertSelective" parameterType="upc.backend.entity.Teacher">
+        insert into teacher
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="idteacher != null">
+                idteacher,
+            </if>
+            <if test="teachername != null">
+                teachername,
+            </if>
+            <if test="locked != null">
+                locked,
+            </if>
+            <if test="deleted != null">
+                deleted,
+            </if>
+            <if test="register_time != null">
+                register_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="idteacher!= null">
+                #{idteacher,jdbcType=INTEGER},
+            </if>
+            <if test="teachername != null">
+                #{teachername,jdbcType=VARCHAR},
+            </if>
+            <if test="locked != null">
+                #{locked,jdbcType=TINYINT},
+            </if>
+            <if test="deleted != null">
+                #{deleted,jdbcType=TINYINT},
+            </if>
+            <if test="register_time != null">
+                #{register_time,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <delete id="deleteBatch" parameterType="java.lang.Integer">
+        delete from teacher
+        where idteacher in
+        <foreach item="idteacher" collection="array" open="(" separator="," close=")">
+            #{idteacher}
+        </foreach>
+    </delete>
+    <select id="selectByID" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from teacher
+        where idteacher = #{idteacher,jdbcType=INTEGER}
+    </select>
+    <update id="updateByPrimaryKeySelective" parameterType="upc.backend.entity.Teacher">
+        update teacher
+        <set>
+            <if test="teachername!= null">
+                teachername = #{teachername,jdbcType=VARCHAR},
+            </if>
+            <if test="locked != null">
+                locked = #{locked,jdbcType=TINYINT},
+            </if>
+            <if test="deleted != null">
+                deleted = #{deleted,jdbcType=TINYINT},
+            </if>
+            <if test="register_time != null">
+                register_time = #{register_time,jdbcType=TIMESTAMP},
+            </if>
+
+        </set>
+        where idteacher = #{idteacher,jdbcType=INTEGER}
+    </update>
+
+</mapper>
